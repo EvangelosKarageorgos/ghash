@@ -29,7 +29,7 @@
 
 /*********************
  *  file: ghash.h    *
- *  version: 0.0.1   *
+ *  version: 0.0.2   *
  *********************/
 
 #pragma once
@@ -238,11 +238,11 @@ namespace ghash{
         insert_result(index_type index, bool inserted) noexcept {
             this->index = index;
             if(!inserted){
-                index = -index - 1;
+                this->index = -index - 1;
             }
         }
         index_type get_index() const noexcept{
-            if(index>0)
+            if(index>=0)
                 return index;
             else
                 return -(index+1);
@@ -271,7 +271,7 @@ namespace ghash{
         /* ------------------------- constructors ---------------------------- */
 
         explicit hash_table_container(size_t capacity=0, Allocator&& alloc=Allocator()) : Allocator(std::move(alloc)) {
-            if(capacity > 0){
+            if(capacity >= 0){ // always have initial capacity
                 set_initial_capacity(capacity);
             } else {
                 m_hash_table = nullptr;
@@ -282,7 +282,7 @@ namespace ghash{
         }
 
         explicit hash_table_container(size_t capacity, const Allocator& alloc) : Allocator(alloc) {
-            if(capacity > 0){
+            if(capacity >= 0){ // always have initial capacity
                 set_initial_capacity(capacity);
             } else {
                 m_hash_table = nullptr;
@@ -2191,7 +2191,7 @@ namespace ghash{
         /* ------------------------- constructors ---------------------------- */
 
         explicit hash_table_list_container(size_t capacity=0, Allocator&& alloc=Allocator()) : Allocator(std::move(alloc)) {
-            if(capacity > 0){
+            if(capacity >= 0){ // always have initial capacity
                 set_initial_capacity(capacity);
             } else {
                 m_hash_table = nullptr;
@@ -2204,7 +2204,7 @@ namespace ghash{
         }
 
         explicit hash_table_list_container(size_t capacity, const Allocator& alloc) : Allocator(alloc) {
-            if(capacity > 0){
+            if(capacity >= 0){ // always have initial capacity
                 set_initial_capacity(capacity);
             } else {
                 m_hash_table = nullptr;
@@ -5263,6 +5263,16 @@ namespace ghash{
         typename TableType::hash_function hash_function() { return TableType::hash_function(); }
         typename TableType::equality_function key_eq() { return TableType::equality_function(); }
 
+        /* ---- non-standard interface ---- */
+        bool search(const key_type& key, value_type* &output)const noexcept{
+            index_type index = hash_table.find_index(key);
+            if(index>=0){
+                output = &(hash_table.get_value(index));
+                return true;
+            }
+            return false;
+        }
+
     //private:
         TableType hash_table;
     };
@@ -5368,12 +5378,12 @@ namespace ghash{
 
         mapped_type& operator[](const key_type& key){
             insert_result result = hash_table.emplace_or_find_value(key);
-            return TableType::kvp_adapter().value(hash_table.get_value(result.get_index()));
+            return typename TableType::kvp_adapter().value(hash_table.get_value(result.get_index()));
         }
 
         mapped_type& operator[](key_type&& key){
             insert_result result = hash_table.emplace_or_find_value(std::move(key));
-            return TableType::kvp_adapter().value(hash_table.get_value(result.get_index()));
+            return typename TableType::kvp_adapter().value(hash_table.get_value(result.get_index()));
         }
 
         size_type count(const key_type& key){
@@ -5398,7 +5408,7 @@ namespace ghash{
             }
         }
 
-        bool contains(const key_type& key){
+        bool contains(const key_type& key) const{
             return hash_table.find_index(key) >= 0;
         }
 
@@ -5502,6 +5512,25 @@ namespace ghash{
 
         typename TableType::hash_function hash_function() { return TableType::hash_function(); }
         typename TableType::key_equality_function key_eq() { return TableType::key_equality_function(); }
+
+        /* ---- non-standard interface ---- */
+        bool search(const key_type& key, mapped_type* &output)const noexcept{
+            index_type index = hash_table.find_index(key);
+            if(index>=0){
+                output = &(typename TableType::kvp_adapter().value(hash_table.get_value(index)));
+                return true;
+            }
+            return false;
+        }
+
+        bool search(const key_type& key, value_type* &output)const noexcept{
+            index_type index = hash_table.find_index(key);
+            if(index>=0){
+                output = &(hash_table.get_value(index));
+                return true;
+            }
+            return false;
+        }
 
     //private:
         TableType hash_table;
