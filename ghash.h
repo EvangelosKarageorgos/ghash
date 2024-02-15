@@ -6,7 +6,7 @@
  *******************************************************************************
  *  MIT License
  *
- *  Copyright (c) 2023 Evangelos Karageorgos
+ *  Copyright (c) 2024 Evangelos Karageorgos
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 
 /*********************
  *  file: ghash.h    *
- *  version: 0.0.2   *
+ *  version: 0.0.3   *
  *********************/
 
 #pragma once
@@ -3979,7 +3979,6 @@ namespace ghash{
             hash_type modded_hash = this->calculate_modded_hash(hash);
             index_type index = find_existing_or_free_index(key, hash, modded_hash);
             if(HT_VALUE_VALID(HT_GET_METADATA_TABLE(this->m_hash_table)[index])){
-                KvpAdapter().value(HT_GET_VALUES_TABLE(this->m_hash_table, this->m_table_size, ListNode<pair_type>*)[index]->value) = V(std::forward<ARGS>(args)...);
                 return {index, false};
             } else {
                 HT_INSERT_ENTRY(hash, modded_hash, index, this->m_hash_table, this->m_table_size)
@@ -4000,7 +3999,6 @@ namespace ghash{
             hash_type modded_hash = this->calculate_modded_hash(hash);
             index_type index = find_existing_or_free_index(key, hash, modded_hash);
             if(HT_VALUE_VALID(HT_GET_METADATA_TABLE(this->m_hash_table)[index])){
-                KvpAdapter().value(HT_GET_VALUES_TABLE(this->m_hash_table, this->m_table_size, ListNode<pair_type>*)[index]->value) = V(std::forward<ARGS>(args)...);
                 return {index, false};
             } else {
                 HT_INSERT_ENTRY(hash, modded_hash, index, this->m_hash_table, this->m_table_size)
@@ -5138,37 +5136,37 @@ namespace ghash{
             return *this;
         }
 
-        iterator begin(){ return hash_table.begin(); }
-        const_iterator begin()const{ return hash_table.cbegin(); }
-        const_iterator cbegin()const{ return hash_table.cbegin(); }
+        iterator begin() noexcept { return hash_table.begin(); }
+        const_iterator begin() const noexcept { return hash_table.cbegin(); }
+        const_iterator cbegin() const noexcept { return hash_table.cbegin(); }
 
-        reverse_iterator rbegin(){ return hash_table.rbegin(); }
-        const_reverse_iterator rbegin()const{ return hash_table.crbegin(); }
-        const_reverse_iterator crbegin()const{ return hash_table.crbegin(); }
+        reverse_iterator rbegin() noexcept { return hash_table.rbegin(); }
+        const_reverse_iterator rbegin() const noexcept { return hash_table.crbegin(); }
+        const_reverse_iterator crbegin() const noexcept { return hash_table.crbegin(); }
 
-        iterator end(){ return hash_table.end(); }
-        const_iterator end()const{ return hash_table.cend(); }
-        const_iterator cend()const{ return hash_table.cend(); }
+        iterator end() noexcept { return hash_table.end(); }
+        const_iterator end() const noexcept { return hash_table.cend(); }
+        const_iterator cend() const noexcept { return hash_table.cend(); }
 
-        reverse_iterator rend(){ return hash_table.rend(); }
-        const_reverse_iterator rend()const{ return hash_table.crend(); }
-        const_reverse_iterator crend()const{ return hash_table.crend(); }
+        reverse_iterator rend() noexcept { return hash_table.rend(); }
+        const_reverse_iterator rend() const noexcept { return hash_table.crend(); }
+        const_reverse_iterator crend() const noexcept { return hash_table.crend(); }
 
-        bool empty(){ return hash_table.size() > 0; }
+        bool empty() const noexcept { return hash_table.size() == 0; }
 
         size_type size() const noexcept { return hash_table.size(); }
 
-        void clear(){ hash_table.clear(); }
+        void clear() { hash_table.clear(); }
 
         allocator get_allocator() const noexcept{
             return allocator(static_cast<allocator*>(this));
         }
 
-        size_type count(const key_type& value) const{
+        size_type count(const key_type& value) const {
             return (hash_table.find_index(value) >= 0) ? 1 : 0;
         }
 
-        const_iterator find(const key_type& value) const{
+        const_iterator find(const key_type& value) const {
             index_type index = hash_table.find_index(value);
             if(index >= 0){
                 return hash_table.at_index(index);
@@ -5334,23 +5332,23 @@ namespace ghash{
             return *this;
         }
 
-        iterator begin(){ return hash_table.begin(); }
-        const_iterator begin()const{ return hash_table.cbegin(); }
-        const_iterator cbegin()const{ return hash_table.cbegin(); }
+        iterator begin() noexcept { return hash_table.begin(); }
+        const_iterator begin() const noexcept { return hash_table.cbegin(); }
+        const_iterator cbegin() const noexcept { return hash_table.cbegin(); }
 
-        reverse_iterator rbegin(){ return hash_table.rbegin(); }
-        const_reverse_iterator rbegin()const{ return hash_table.crbegin(); }
-        const_reverse_iterator crbegin()const{ return hash_table.crbegin(); }
+        reverse_iterator rbegin() noexcept { return hash_table.rbegin(); }
+        const_reverse_iterator rbegin() const noexcept { return hash_table.crbegin(); }
+        const_reverse_iterator crbegin() const noexcept { return hash_table.crbegin(); }
 
-        iterator end(){ return hash_table.end(); }
-        const_iterator end()const{ return hash_table.cend(); }
-        const_iterator cend()const{ return hash_table.cend(); }
+        iterator end() noexcept { return hash_table.end(); }
+        const_iterator end() const noexcept { return hash_table.cend(); }
+        const_iterator cend() const noexcept { return hash_table.cend(); }
 
-        reverse_iterator rend(){ return hash_table.rend(); }
-        const_reverse_iterator rend()const{ return hash_table.crend(); }
-        const_reverse_iterator crend()const{ return hash_table.crend(); }
+        reverse_iterator rend() noexcept { return hash_table.rend(); }
+        const_reverse_iterator rend() const noexcept { return hash_table.crend(); }
+        const_reverse_iterator crend() const noexcept { return hash_table.crend(); }
 
-        bool empty(){ return hash_table.size() > 0; }
+        bool empty() const noexcept { return hash_table.size() == 0; }
 
         size_type size() const noexcept { return hash_table.size();}
 
